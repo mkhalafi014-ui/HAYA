@@ -99,23 +99,11 @@ button,input,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-v
   <div class="task"><h3>نوبت توست</h3><p id="taskText"></p>
     <div class="editorwrap"><div class="editortop"><span>✎ کد خودت را بنویس</span><span id="editorLang">HTML</span></div><textarea id="codeEditor" class="editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>
     <div class="feedback" id="feedback" aria-live="polite">وقتی آماده شدی، روی «بررسی کد» بزن.</div>
-    <div class="actions"><button class="btn primary" id="checkBtn">بررسی کد</button><button class="btn secondary" id="hintBtn">راهنمایی</button><button class="btn secondary" id="runBtn">اجرای کد ↗</button></div>
+    <div class="actions"><button class="btn primary" id="checkBtn">بررسی کد</button><button class="btn secondary" id="hintBtn">راهنمایی</button><button class="btn secondary" id="runBtn">رفتن به پیش‌نمایش ↗</button></div>
   </div>
   <div class="lessonbottom"><button class="btn secondary" id="prevBtn">مرحلهٔ قبل</button><span class="muted" id="completeNote" style="font-size:12px"></span><button class="btn primary" id="nextBtn">مرحلهٔ بعد ←</button></div>
 </section>
-<section class="panel">
-  <div class="panelhead"><h2>پیش‌نمایش زنده</h2><span class="tag">خروجی</span></div>
-  <p class="muted" style="font-size:13px;margin-top:0">کدت را اجرا کن تا نتیجه را در این بخش ببینی. این صفحه فقط برای نمایش خروجی است.</p>
-  <div class="preview"><iframe id="previewFrame" title="پیش‌نمایش کد" sandbox="allow-scripts"></iframe></div>
-  <div class="previewhint">نکته: برای امنیت، کد داخل یک قاب جدا اجرا می‌شود.</div>
-  <div style="height:1px;background:var(--line);margin:20px 0"></div>
-  <div class="panelhead"><h2>یادآوری سریع</h2><span class="tag">کمک‌یار</span></div>
-  <div id="quickHelp" class="muted" style="font-size:13px">HTML ساختار صفحه را می‌سازد؛ CSS ظاهر آن را تغییر می‌دهد؛ JavaScript رفتار و تعامل اضافه می‌کند.</div>
-  <div style="height:1px;background:var(--line);margin:20px 0"></div>
-  <div class="panelhead"><h2>ذخیرهٔ پیشرفت</h2></div>
-  <p class="muted" style="font-size:13px">پیشرفت روی همین دستگاه ذخیره می‌شود. برای انتقال آن می‌توانی نسخهٔ پشتیبان بگیری.</p>
-  <div class="actions"><button class="btn secondary" id="exportBtn">خروجی گرفتن از پیشرفت</button><button class="btn secondary" id="importBtn">وارد کردن پیشرفت</button><input type="file" id="importFile" accept="application/json" class="hidden"></div>
-</section>
+
 </div>
 <div class="footer">کدستان · هر روز یک قدم نرم‌تر به سوی مهارت.</div>
 </main>
@@ -127,6 +115,22 @@ button,input,textarea{font:inherit}button{cursor:pointer;border:0}button:focus-v
       <div class="practice-mark">✎</div>
     </div>
     <div id="practiceTaskHost"></div>
+<section id="previewPage" class="practice-page hidden">
+  <div class="practice-shell">
+    <div class="practice-head">
+      <div><span class="eyebrow">محیط اجرا</span><h1>پیش‌نمایش زنده</h1><p>نتیجهٔ کدی را که در صفحهٔ تمرین نوشته‌ای، اینجا ببین.</p></div>
+      <div class="practice-mark">▣</div>
+    </div>
+    <div class="panelhead"><h2>خروجی کد</h2><span class="tag">زنده</span></div>
+    <div class="preview"><iframe id="previewFrame" title="پیش‌نمایش کد" sandbox="allow-scripts"></iframe></div>
+    <p class="previewhint">برای امنیت، کد داخل یک قاب جدا اجرا می‌شود. برای به‌روزرسانی نتیجه، به تمرین برگرد و «اجرای کد» را بزن.</p>
+    <div style="height:1px;background:var(--line);margin:20px 0"></div>
+    <div class="panelhead"><h2>یادآوری سریع</h2><span class="tag">کمک‌یار</span></div>
+    <div id="quickHelp" class="muted" style="font-size:13px">HTML ساختار صفحه را می‌سازد؛ CSS ظاهر آن را تغییر می‌دهد؛ JavaScript رفتار و تعامل اضافه می‌کند.</div>
+    <div class="practice-foot"><button class="btn secondary" id="backToPractice">بازگشت به «نوبت توست»</button><button class="btn primary" id="refreshPreview">اجرای دوباره ↻</button></div>
+  </div>
+</section>
+
     <div class="practice-foot"><button class="btn secondary" id="backToLesson">بازگشت به درس</button><button class="btn primary" id="practiceNext">ادامه به مرحلهٔ بعد ←</button></div>
   </div>
 </section>
@@ -189,15 +193,17 @@ function hint(){const l=getLesson(state.current);$('feedback').textContent='را
 let selectedChapter='html',stageVisible=25;
 function chapterRange(key){return key==='html'?{first:1,last:200,name:'HTML'}:key==='js'?{first:201,last:350,name:'JavaScript'}:{first:351,last:500,name:'CSS'};}
 function showSelection(){ $('lessonPage').classList.add('hidden');$('selectionPage').classList.remove('hidden');$('backToStages').style.display='none';renderStagePicker();window.scrollTo({top:0,behavior:'smooth'}); }
-function openLesson(id){go(id);$('practicePage').classList.add('hidden');$('selectionPage').classList.add('hidden');$('lessonPage').classList.remove('hidden');$('backToStages').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'});}
-function openPractice(){render();$('lessonPage').classList.add('hidden');$('selectionPage').classList.add('hidden');$('practicePage').classList.remove('hidden');$('backToStages').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'});}
-function backToLesson(){ $('practicePage').classList.add('hidden');$('lessonPage').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}
+function openLesson(id){go(id);$('previewPage').classList.add('hidden');$('practicePage').classList.add('hidden');$('selectionPage').classList.add('hidden');$('lessonPage').classList.remove('hidden');$('backToStages').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'});}
+function openPractice(){render();$('previewPage').classList.add('hidden');$('lessonPage').classList.add('hidden');$('selectionPage').classList.add('hidden');$('practicePage').classList.remove('hidden');$('backToStages').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'});}
+function openPreview(){runCode();$('lessonPage').classList.add('hidden');$('selectionPage').classList.add('hidden');$('practicePage').classList.add('hidden');$('previewPage').classList.remove('hidden');$('backToStages').style.display='inline-flex';window.scrollTo({top:0,behavior:'smooth'});}
+function backToLesson(){ $('previewPage').classList.add('hidden');$('practicePage').classList.add('hidden');$('lessonPage').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}
+function backToPractice(){ $('previewPage').classList.add('hidden');$('practicePage').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}
 function renderStagePicker(){const r=chapterRange(selectedChapter);$('stagePickerTitle').textContent='مرحله‌های '+r.name;$('stagePickerHint').textContent='مرحلهٔ باز را انتخاب کن؛ مرحله‌های بعدی با حل تمرین باز می‌شوند.';const root=$('stageButtons');root.innerHTML='';const lastVisible=Math.min(r.last,r.first+stageVisible-1);for(let id=r.first;id<=lastVisible;id++){const l=getLesson(id),locked=id>state.unlocked&&!state.completed.includes(id),b=document.createElement('button');b.className='stage-button'+(state.completed.includes(id)?' done':'')+(id===state.current?' current':'');b.disabled=locked;b.innerHTML='<strong>'+fa(id)+'</strong><small>'+(state.completed.includes(id)?'✓ تکمیل‌شده':locked?'🔒 قفل':'باز')+'</small>';b.addEventListener('click',()=>openLesson(id));root.appendChild(b);} $('showMoreStages').classList.toggle('hidden',lastVisible>=r.last);}
 document.querySelectorAll('[data-chapter]').forEach(b=>b.addEventListener('click',()=>{selectedChapter=b.dataset.chapter;stageVisible=25;$('stagePicker').classList.remove('hidden');renderStagePicker();$('stagePicker').scrollIntoView({behavior:'smooth',block:'start'});}));
 $('showMoreStages').addEventListener('click',()=>{stageVisible+=25;renderStagePicker();});$('hideStages').addEventListener('click',()=>$('stagePicker').classList.add('hidden'));$('backToStages').addEventListener('click',showSelection);
 $('practiceTaskHost').appendChild(document.querySelector('.task'));
-$('goPractice').addEventListener('click',openPractice);$('backToLesson').addEventListener('click',backToLesson);$('practiceNext').addEventListener('click',()=>{if(state.completed.includes(state.current)){if(state.current<total){openLesson(state.current+1);}else{showSelection();toast('مسیر یادگیری را کامل کردی!');}}else{toast('اول تمرین را درست حل کن تا مرحلهٔ بعد باز شود.');}});
-$('checkBtn').addEventListener('click',check);$('hintBtn').addEventListener('click',hint);$('runBtn').addEventListener('click',()=>{runCode();toast('کد اجرا شد.');});$('prevBtn').addEventListener('click',()=>go(state.current-1));$('nextBtn').addEventListener('click',()=>{if(state.completed.includes(state.current))go(state.current+1);else toast('اول تمرین را درست حل کن تا مرحلهٔ بعد باز شود.');});$('continueBtn').addEventListener('click',()=>{let first=1;while(first<=total&&state.completed.includes(first))first++;openLesson(first<=total?first:total);});
+$('goPractice').addEventListener('click',openPractice);$('backToLesson').addEventListener('click',backToLesson);$('backToPractice').addEventListener('click',backToPractice);$('refreshPreview').addEventListener('click',()=>{runCode();toast('پیش‌نمایش به‌روز شد.');});$('practiceNext').addEventListener('click',()=>{if(state.completed.includes(state.current)){if(state.current<total){openLesson(state.current+1);}else{showSelection();toast('مسیر یادگیری را کامل کردی!');}}else{toast('اول تمرین را درست حل کن تا مرحلهٔ بعد باز شود.');}});
+$('checkBtn').addEventListener('click',check);$('hintBtn').addEventListener('click',hint);$('runBtn').addEventListener('click',openPreview);$('prevBtn').addEventListener('click',()=>go(state.current-1));$('nextBtn').addEventListener('click',()=>{if(state.completed.includes(state.current))go(state.current+1);else toast('اول تمرین را درست حل کن تا مرحلهٔ بعد باز شود.');});$('continueBtn').addEventListener('click',()=>{let first=1;while(first<=total&&state.completed.includes(first))first++;openLesson(first<=total?first:total);});
 $('codeEditor').addEventListener('input',()=>{state.drafts[state.current]=$('codeEditor').value;save();});$('codeEditor').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart,en=t.selectionEnd;t.value=t.value.slice(0,s)+'  '+t.value.slice(en);t.selectionStart=t.selectionEnd=s+2;state.drafts[state.current]=t.value;save();}});
 
 $('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='kodestan-progress.json';a.click();URL.revokeObjectURL(url);});
